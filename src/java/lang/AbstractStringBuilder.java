@@ -146,7 +146,7 @@ abstract class AbstractStringBuilder implements Appendable, CharSequence {
      *         greater than Integer.MAX_VALUE
      */
     private int newCapacity(int minCapacity) {
-        // overflow-conscious code
+        // overflow-conscious code  数组扩容 2n+2
         int newCapacity = (value.length << 1) + 2;
         if (newCapacity - minCapacity < 0) {
             newCapacity = minCapacity;
