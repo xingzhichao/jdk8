@@ -281,6 +281,13 @@ class Thread implements Runnable {
      * bugs due to race conditions. It may also be useful when designing
      * concurrency control constructs such as the ones in the
      * {@link java.util.concurrent.locks} package.
+     * <p>
+     * 使当前线程从运行状态变为就绪状态。 cpu 会从众多的可执行态里
+     * 选择，也就是说，当前也就是刚刚的那个线程还是有可能会被再次执行到的，并
+     * 不是说一定会执行其他线程而该线程在下一次中不会执行到了。
+     * <p>
+     * 3.yield()方法仅释放 CPU 执行权，锁仍然占用，线程会被放入就绪队列，会
+     * 在短时间内再次执行。
      */
     public static native void yield();
 
@@ -295,6 +302,10 @@ class Thread implements Runnable {
      * @throws InterruptedException     if any thread has interrupted the current thread. The
      *                                  <i>interrupted status</i> of the current thread is
      *                                  cleared when this exception is thrown.
+     *                                  <p>
+     *                                  睡眠指定毫秒， 并不释放 monitor。
+     *                                  2.sleep(long)方法仅释放 CPU 使用权，锁仍然占用；
+     *                                  线程被放入超时等待队列，与 yield 相比，它会使线程较长时间得不到运行。
      */
     public static native void sleep(long millis) throws InterruptedException;
 
@@ -980,6 +991,8 @@ class Thread implements Runnable {
      * For more information, see
      * <a href="{@docRoot}/../technotes/guides/concurrency/threadPrimitiveDeprecation.html">Why
      * are Thread.stop, Thread.suspend and Thread.resume Deprecated?</a>.
+     * <p>
+     * Thread.suspend 和 Thread.resume 容易造成死锁
      */
     @Deprecated
     public final void suspend() {
@@ -1006,6 +1019,8 @@ class Thread implements Runnable {
      * For more information, see
      * <a href="{@docRoot}/../technotes/guides/concurrency/threadPrimitiveDeprecation.html">Why
      * are Thread.stop, Thread.suspend and Thread.resume Deprecated?</a>.
+     * <p>
+     * Thread.suspend 和 Thread.resume 容易造成死锁
      */
     @Deprecated
     public final void resume() {
@@ -1403,8 +1418,7 @@ class Thread implements Runnable {
     }
 
     /**
-     * Returns <tt>true</tt> if and only if the current thread holds the
-     * monitor lock on the specified object.
+     * 当且仅当,当前线程拥有对象的监视器，则返回true。
      *
      * <p>This method is designed to allow a program to assert that
      * the current thread already holds a specified lock:
@@ -1677,7 +1691,7 @@ class Thread implements Runnable {
          * be waiting for other resources from the operating system
          * such as processor.
          * <p>
-         * Java 线程将操作系统中的就绪和运行两种状态笼统
+         * Java 线程将操作系统中的“就绪”和“运行”两种状态笼统
          * 地称作“运行中”。
          */
         RUNNABLE,
