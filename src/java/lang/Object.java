@@ -64,87 +64,24 @@ public class Object {
     public final native Class<?> getClass();
 
     /**
-     * Returns a hash code value for the object. This method is
-     * supported for the benefit of hash tables such as those provided by
-     * {@link java.util.HashMap}.
-     * <p>
-     * The general contract of {@code hashCode} is:
-     * <ul>
-     * <li>Whenever it is invoked on the same object more than once during
-     * an execution of a Java application, the {@code hashCode} method
-     * must consistently return the same integer, provided no information
-     * used in {@code equals} comparisons on the object is modified.
-     * This integer need not remain consistent from one execution of an
-     * application to another execution of the same application.
-     * <li>If two objects are equal according to the {@code equals(Object)}
-     * method, then calling the {@code hashCode} method on each of
-     * the two objects must produce the same integer result.
-     * <li>It is <em>not</em> required that if two objects are unequal
-     * according to the {@link java.lang.Object#equals(java.lang.Object)}
-     * method, then calling the {@code hashCode} method on each of the
-     * two objects must produce distinct integer results.  However, the
-     * programmer should be aware that producing distinct integer results
-     * for unequal objects may improve the performance of hash tables.
-     * </ul>
-     * <p>
-     * As much as is reasonably practical, the hashCode method defined by
-     * class {@code Object} does return distinct integers for distinct
-     * objects. (This is typically implemented by converting the internal
-     * address of the object into an integer, but this implementation
-     * technique is not required by the
-     * Java&trade; programming language.)
+     * hashCode()返回值与 equals()关系：
+     * 1． equals()相等，那么 hashCode()一定是相等的；
+     * 2． hashCode()相等， equals()不一定相等。
+     * 因此， 改写 equals()时，总是要改写 hashCode()。
      *
-     * @return a hash code value for this object.
+     * @return 默认情况下，对象的哈希码是通过将该对象的内部地址转换成一个整数来实现的。
      * @see java.lang.Object#equals(java.lang.Object)
      * @see java.lang.System#identityHashCode
      */
     public native int hashCode();
 
     /**
-     * Indicates whether some other object is "equal to" this one.
-     * <p>
-     * The {@code equals} method implements an equivalence relation
-     * on non-null object references:
-     * <ul>
-     * <li>It is <i>reflexive</i>: for any non-null reference value
-     * {@code x}, {@code x.equals(x)} should return
-     * {@code true}.
-     * <li>It is <i>symmetric</i>: for any non-null reference values
-     * {@code x} and {@code y}, {@code x.equals(y)}
-     * should return {@code true} if and only if
-     * {@code y.equals(x)} returns {@code true}.
-     * <li>It is <i>transitive</i>: for any non-null reference values
-     * {@code x}, {@code y}, and {@code z}, if
-     * {@code x.equals(y)} returns {@code true} and
-     * {@code y.equals(z)} returns {@code true}, then
-     * {@code x.equals(z)} should return {@code true}.
-     * <li>It is <i>consistent</i>: for any non-null reference values
-     * {@code x} and {@code y}, multiple invocations of
-     * {@code x.equals(y)} consistently return {@code true}
-     * or consistently return {@code false}, provided no
-     * information used in {@code equals} comparisons on the
-     * objects is modified.
-     * <li>For any non-null reference value {@code x},
-     * {@code x.equals(null)} should return {@code false}.
-     * </ul>
-     * <p>
-     * The {@code equals} method for class {@code Object} implements
-     * the most discriminating possible equivalence relation on objects;
-     * that is, for any non-null reference values {@code x} and
-     * {@code y}, this method returns {@code true} if and only
-     * if {@code x} and {@code y} refer to the same object
-     * ({@code x == y} has the value {@code true}).
-     * <p>
-     * Note that it is generally necessary to override the {@code hashCode}
-     * method whenever this method is overridden, so as to maintain the
-     * general contract for the {@code hashCode} method, which states
-     * that equal objects must have equal hash codes.
-     *
-     * @param obj the reference object with which to compare.
-     * @return {@code true} if this object is the same as the obj
-     * argument; {@code false} otherwise.
-     * @see #hashCode()
-     * @see java.util.HashMap
+     * 问： 在什么情况下会重写 hashCode()和 equals()?
+     * 答：
+     * 不被重写（原生）的 equals 方法是严格判断一个对象是否相等的方法
+     * （object1 == object2）。
+     * 在我们的业务系统中判断对象时有时候需要的不是一种严格意义上
+     * 的相等，而是一种业务上的对象相等。
      */
     public boolean equals(Object obj) {
         return (this == obj);
@@ -238,36 +175,16 @@ public class Object {
     }
 
     /**
-     * Wakes up a single thread that is waiting on this object's
-     * monitor. If any threads are waiting on this object, one of them
-     * is chosen to be awakened. The choice is arbitrary and occurs at
-     * the discretion of the implementation. A thread waits on an object's
-     * monitor by calling one of the {@code wait} methods.
+     * final 修饰。
+     * 唤醒一个在此对象监视器上等待的线程.
      * <p>
-     * The awakened thread will not be able to proceed until the current
-     * thread relinquishes the lock on this object. The awakened thread will
-     * compete in the usual manner with any other threads that might be
-     * actively competing to synchronize on this object; for example, the
-     * awakened thread enjoys no reliable privilege or disadvantage in being
-     * the next thread to lock this object.
-     * <p>
-     * This method should only be called by a thread that is the owner
-     * of this object's monitor. A thread becomes the owner of the
-     * object's monitor in one of three ways:
-     * <ul>
-     * <li>By executing a synchronized instance method of that object.
-     * <li>By executing the body of a {@code synchronized} statement
-     * that synchronizes on the object.
-     * <li>For objects of type {@code Class,} by executing a
-     * synchronized static method of that class.
-     * </ul>
-     * <p>
-     * Only one thread at a time can own an object's monitor.
-     *
-     * @throws IllegalMonitorStateException if the current thread is not
-     *                                      the owner of this object's monitor.
-     * @see java.lang.Object#notifyAll()
-     * @see java.lang.Object#wait()
+     * wait/notify 与 monitor 关系：
+     * 1． wait 调用之前，必须获取到 monitor；
+     * 2． 调用 wait 后，会释放掉 monitor；
+     * 3． 调用 notify 之前，必须获取到 monitor；
+     * 4． 调用 notify 后要手动释放掉 monitor；
+     * 5． 当 wait 被唤醒后，会自动获取 monitor。
+     * 6． 如果主线程终止（执行完成） 了，也会释放掉 monitor。
      */
     public final native void notify();
 
@@ -462,40 +379,20 @@ public class Object {
     }
 
     /**
-     * Causes the current thread to wait until another thread invokes the
-     * {@link java.lang.Object#notify()} method or the
-     * {@link java.lang.Object#notifyAll()} method for this object.
-     * In other words, this method behaves exactly as if it simply
-     * performs the call {@code wait(0)}.
+     * final 修饰。
+     * 放弃监视器（锁）并进入阻塞状态，直到其他线程持有获得执行权，
+     * 并持有了相同的监视器（锁）并调用 notify 为止。
      * <p>
-     * The current thread must own this object's monitor. The thread
-     * releases ownership of this monitor and waits until another thread
-     * notifies threads waiting on this object's monitor to wake up
-     * either through a call to the {@code notify} method or the
-     * {@code notifyAll} method. The thread then waits until it can
-     * re-obtain ownership of the monitor and resumes execution.
+     * 问：wait 为什么被建议放在一个 while 循环里？
      * <p>
-     * As in the one argument version, interrupts and spurious wakeups are
-     * possible, and this method should always be used in a loop:
-     * <pre>
-     *     synchronized (obj) {
-     *         while (&lt;condition does not hold&gt;)
-     *             obj.wait();
-     *         ... // Perform action appropriate to condition
-     *     }
-     * </pre>
-     * This method should only be called by a thread that is the owner
-     * of this object's monitor. See the {@code notify} method for a
-     * description of the ways in which a thread can become the owner of
-     * a monitor.
+     * wait 前会释放监视器，被唤醒后又要重新获取，这瞬间可能有其他线程刚好
+     * 先获取到了监视器，从而导致状态发生了变化， 这时候用 while 循环来再判断
+     * 一下条件（比如队列是否为空）来避免不必要或有问题的操作。
+     * 这种机制还可以
+     * 用来处理伪唤醒（spurious wakeup），所谓伪唤醒就是 no reason wakeup。
+     * <p>
+     * 自旋的好处是线程不需要睡眠和唤醒，减小了系统调用的开销。
      *
-     * @throws IllegalMonitorStateException if the current thread is not
-     *                                      the owner of the object's monitor.
-     * @throws InterruptedException         if any thread interrupted the
-     *                                      current thread before or while the current thread
-     *                                      was waiting for a notification.  The <i>interrupted
-     *                                      status</i> of the current thread is cleared when
-     *                                      this exception is thrown.
      * @see java.lang.Object#notify()
      * @see java.lang.Object#notifyAll()
      * <p>
@@ -507,51 +404,16 @@ public class Object {
     }
 
     /**
-     * Called by the garbage collector on an object when garbage collection
-     * determines that there are no more references to the object.
-     * A subclass overrides the {@code finalize} method to dispose of
-     * system resources or to perform other cleanup.
-     * <p>
-     * The general contract of {@code finalize} is that it is invoked
-     * if and when the Java&trade; virtual
-     * machine has determined that there is no longer any
-     * means by which this object can be accessed by any thread that has
-     * not yet died, except as a result of an action taken by the
-     * finalization of some other object or class which is ready to be
-     * finalized. The {@code finalize} method may take any action, including
-     * making this object available again to other threads; the usual purpose
-     * of {@code finalize}, however, is to perform cleanup actions before
-     * the object is irrevocably discarded. For example, the finalize method
-     * for an object that represents an input/output connection might perform
-     * explicit I/O transactions to break the connection before the object is
-     * permanently discarded.
-     * <p>
-     * The {@code finalize} method of class {@code Object} performs no
-     * special action; it simply returns normally. Subclasses of
-     * {@code Object} may override this definition.
-     * <p>
-     * The Java programming language does not guarantee which thread will
-     * invoke the {@code finalize} method for any given object. It is
-     * guaranteed, however, that the thread that invokes finalize will not
-     * be holding any user-visible synchronization locks when finalize is
-     * invoked. If an uncaught exception is thrown by the finalize method,
-     * the exception is ignored and finalization of that object terminates.
-     * <p>
-     * After the {@code finalize} method has been invoked for an object, no
-     * further action is taken until the Java virtual machine has again
-     * determined that there is no longer any means by which this object can
-     * be accessed by any thread that has not yet died, including possible
-     * actions by other objects or classes which are ready to be finalized,
-     * at which point the object may be discarded.
-     * <p>
-     * The {@code finalize} method is never invoked more than once by a Java
-     * virtual machine for any given object.
-     * <p>
-     * Any exception thrown by the {@code finalize} method causes
-     * the finalization of this object to be halted, but is otherwise
-     * ignored.
+     * 当 JVM 进行垃圾回收时触发
+     * 尽管 finalize 在某些时候是有用的，但是在大部分情况下，还是不建议使用，
+     * 基于以下几点：
+     * 1． 不保证会被 jvm 执行，且不知道何时才会执行。
+     * 这就给程序执行带来了很大不确定性。
+     * 2． 不同的 jvm 垃圾回收算法不一致，在一个 jvm 上工作良好，
+     * 可能在另一个 jvm 上未必有效。
+     * 3． 性能。根据 Joshua Bloch 在《Effective Java》中的描述，增加了 finalize 后，
+     * 对象的创建和销毁时间慢了 430 倍。
      *
-     * @throws Throwable the {@code Exception} raised by this method
      * @jls 12.6 Finalization of Class Instances
      * @see java.lang.ref.WeakReference
      * @see java.lang.ref.PhantomReference
