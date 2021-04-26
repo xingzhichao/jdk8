@@ -28,19 +28,21 @@ package java.lang.ref;
 import java.util.function.Consumer;
 
 /**
- * Reference queues, to which registered reference objects are appended by the
- * garbage collector after the appropriate reachability changes are detected.
+ * 存放引用的队列，保存的是 Reference 对象。
+ * 其作用在于 Reference 对象所引用的对象被 GC 回收时，
+ * 该 Reference 对象 将会被 加入 引 用 队 列 中（ReferenceQueue的队列末尾)。
+ * todo： 应用
  *
- * @author   Mark Reinhold
- * @since    1.2
+ * @author Mark Reinhold
+ * @since 1.2
  */
-
 public class ReferenceQueue<T> {
 
     /**
      * Constructs a new reference-object queue.
      */
-    public ReferenceQueue() { }
+    public ReferenceQueue() {
+    }
 
     private static class Null<S> extends ReferenceQueue<S> {
         boolean enqueue(Reference<? extends S> r) {
@@ -51,7 +53,10 @@ public class ReferenceQueue<T> {
     static ReferenceQueue<Object> NULL = new Null<>();
     static ReferenceQueue<Object> ENQUEUED = new Null<>();
 
-    static private class Lock { };
+    static private class Lock {
+    }
+
+    ;
     private Lock lock = new Lock();
     private volatile Reference<? extends T> head = null;
     private long queueLength = 0;
@@ -99,8 +104,8 @@ public class ReferenceQueue<T> {
      * available without further delay then it is removed from the queue and
      * returned.  Otherwise this method immediately returns <tt>null</tt>.
      *
-     * @return  A reference object, if one was immediately available,
-     *          otherwise <code>null</code>
+     * @return A reference object, if one was immediately available,
+     * otherwise <code>null</code>
      */
     public Reference<? extends T> poll() {
         if (head == null)
@@ -117,22 +122,16 @@ public class ReferenceQueue<T> {
      * <p> This method does not offer real-time guarantees: It schedules the
      * timeout as if by invoking the {@link Object#wait(long)} method.
      *
-     * @param  timeout  If positive, block for up to <code>timeout</code>
-     *                  milliseconds while waiting for a reference to be
-     *                  added to this queue.  If zero, block indefinitely.
-     *
-     * @return  A reference object, if one was available within the specified
-     *          timeout period, otherwise <code>null</code>
-     *
-     * @throws  IllegalArgumentException
-     *          If the value of the timeout argument is negative
-     *
-     * @throws  InterruptedException
-     *          If the timeout wait is interrupted
+     * @param timeout If positive, block for up to <code>timeout</code>
+     *                milliseconds while waiting for a reference to be
+     *                added to this queue.  If zero, block indefinitely.
+     * @return A reference object, if one was available within the specified
+     * timeout period, otherwise <code>null</code>
+     * @throws IllegalArgumentException If the value of the timeout argument is negative
+     * @throws InterruptedException     If the timeout wait is interrupted
      */
     public Reference<? extends T> remove(long timeout)
-        throws IllegalArgumentException, InterruptedException
-    {
+            throws IllegalArgumentException, InterruptedException {
         if (timeout < 0) {
             throw new IllegalArgumentException("Negative timeout value");
         }
@@ -140,7 +139,7 @@ public class ReferenceQueue<T> {
             Reference<? extends T> r = reallyPoll();
             if (r != null) return r;
             long start = (timeout == 0) ? 0 : System.nanoTime();
-            for (;;) {
+            for (; ; ) {
                 lock.wait(timeout);
                 r = reallyPoll();
                 if (r != null) return r;
@@ -159,7 +158,7 @@ public class ReferenceQueue<T> {
      * becomes available.
      *
      * @return A reference object, blocking until one becomes available
-     * @throws  InterruptedException  If the wait is interrupted
+     * @throws InterruptedException If the wait is interrupted
      */
     public Reference<? extends T> remove() throws InterruptedException {
         return remove(0);
@@ -174,7 +173,7 @@ public class ReferenceQueue<T> {
      * than necessary.
      */
     void forEach(Consumer<? super Reference<? extends T>> action) {
-        for (Reference<? extends T> r = head; r != null;) {
+        for (Reference<? extends T> r = head; r != null; ) {
             action.accept(r);
             @SuppressWarnings("unchecked")
             Reference<? extends T> rn = r.next;

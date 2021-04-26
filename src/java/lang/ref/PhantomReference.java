@@ -27,29 +27,14 @@ package java.lang.ref;
 
 
 /**
- * Phantom reference objects, which are enqueued after the collector
- * determines that their referents may otherwise be reclaimed.  Phantom
- * references are most often used for scheduling pre-mortem cleanup actions in
- * a more flexible way than is possible with the Java finalization mechanism.
+ * 该引用必须和引用队列（ReferenceQueue） 一起使用，
+ * 一般用于实现追踪垃圾收集器的回收动作，
+ * 比如在对象被回收的时候，会调用该对象的 finalize 方法，
+ * 在使用虚引用可以实现该动作，也更加安全。
  *
- * <p> If the garbage collector determines at a certain point in time that the
- * referent of a phantom reference is <a
- * href="package-summary.html#reachability">phantom reachable</a>, then at that
- * time or at some later time it will enqueue the reference.
- *
- * <p> In order to ensure that a reclaimable object remains so, the referent of
- * a phantom reference may not be retrieved: The <code>get</code> method of a
- * phantom reference always returns <code>null</code>.
- *
- * <p> Unlike soft and weak references, phantom references are not
- * automatically cleared by the garbage collector as they are enqueued.  An
- * object that is reachable via phantom references will remain so until all
- * such references are cleared or themselves become unreachable.
- *
- * @author   Mark Reinhold
- * @since    1.2
+ * @author Mark Reinhold
+ * @since 1.2
  */
-
 public class PhantomReference<T> extends Reference<T> {
 
     /**
@@ -57,7 +42,7 @@ public class PhantomReference<T> extends Reference<T> {
      * phantom reference is always inaccessible, this method always returns
      * <code>null</code>.
      *
-     * @return  <code>null</code>
+     * @return <code>null</code>
      */
     public T get() {
         return null;
@@ -73,8 +58,8 @@ public class PhantomReference<T> extends Reference<T> {
      * will never be enqueued.
      *
      * @param referent the object the new phantom reference will refer to
-     * @param q the queue with which the reference is to be registered,
-     *          or <tt>null</tt> if registration is not required
+     * @param q        the queue with which the reference is to be registered,
+     *                 or <tt>null</tt> if registration is not required
      */
     public PhantomReference(T referent, ReferenceQueue<? super T> q) {
         super(referent, q);

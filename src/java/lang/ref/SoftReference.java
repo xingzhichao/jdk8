@@ -27,40 +27,13 @@ package java.lang.ref;
 
 
 /**
- * Soft reference objects, which are cleared at the discretion of the garbage
- * collector in response to memory demand.  Soft references are most often used
- * to implement memory-sensitive caches.
+ * 软引用： 非强引用，但是可以通过软引用对象来访问。
+ * 软引用的对象，只有在内存不足的时候（抛出 OOM 异常前），
+ * 垃圾收集器会决定回收该软引用所指向的对象。
  *
- * <p> Suppose that the garbage collector determines at a certain point in time
- * that an object is <a href="package-summary.html#reachability">softly
- * reachable</a>.  At that time it may choose to clear atomically all soft
- * references to that object and all soft references to any other
- * softly-reachable objects from which that object is reachable through a chain
- * of strong references.  At the same time or at some later time it will
- * enqueue those newly-cleared soft references that are registered with
- * reference queues.
- *
- * <p> All soft references to softly-reachable objects are guaranteed to have
- * been cleared before the virtual machine throws an
- * <code>OutOfMemoryError</code>.  Otherwise no constraints are placed upon the
- * time at which a soft reference will be cleared or the order in which a set
- * of such references to different objects will be cleared.  Virtual machine
- * implementations are, however, encouraged to bias against clearing
- * recently-created or recently-used soft references.
- *
- * <p> Direct instances of this class may be used to implement simple caches;
- * this class or derived subclasses may also be used in larger data structures
- * to implement more sophisticated caches.  As long as the referent of a soft
- * reference is strongly reachable, that is, is actually in use, the soft
- * reference will not be cleared.  Thus a sophisticated cache can, for example,
- * prevent its most recently used entries from being discarded by keeping
- * strong referents to those entries, leaving the remaining entries to be
- * discarded at the discretion of the garbage collector.
- *
- * @author   Mark Reinhold
- * @since    1.2
+ * @author Mark Reinhold
+ * @since 1.2
  */
-
 public class SoftReference<T> extends Reference<T> {
 
     /**
@@ -91,9 +64,8 @@ public class SoftReference<T> extends Reference<T> {
      * registered with the given queue.
      *
      * @param referent object the new soft reference will refer to
-     * @param q the queue with which the reference is to be registered,
-     *          or <tt>null</tt> if registration is not required
-     *
+     * @param q        the queue with which the reference is to be registered,
+     *                 or <tt>null</tt> if registration is not required
      */
     public SoftReference(T referent, ReferenceQueue<? super T> q) {
         super(referent, q);
@@ -105,8 +77,8 @@ public class SoftReference<T> extends Reference<T> {
      * been cleared, either by the program or by the garbage collector, then
      * this method returns <code>null</code>.
      *
-     * @return   The object to which this reference refers, or
-     *           <code>null</code> if this reference object has been cleared
+     * @return The object to which this reference refers, or
+     * <code>null</code> if this reference object has been cleared
      */
     public T get() {
         T o = super.get();
